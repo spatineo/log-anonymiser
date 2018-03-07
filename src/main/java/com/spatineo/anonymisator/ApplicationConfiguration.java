@@ -36,6 +36,7 @@ public class ApplicationConfiguration {
 		tmp.put("dns.disabled", "Disable DNS lookups (enabled by default)");
 		tmp.put("dns.server", "DNS server(s) to use as a comma-delimited list, for example --dns.server=8.8.8.8,4.4.4.4 for Google public DNS (use system settings by default)");
 		tmp.put("dns.parallel", "How many concurrent DNS lookups may be done in parallel (default 16)");
+		tmp.put("dns.timeoutmillis", "DNS lookup timeout in milliseconds (default 30000)");
 		tmp.put("help", "Display this message");
 		
 		legalParameters = Collections.unmodifiableMap(tmp);
@@ -119,7 +120,8 @@ public class ApplicationConfiguration {
 	public DnsLookupConfiguration dnsLookup(
 			@Value("${dns.disabled:#{null}}") String nodns,
 			@Value("${dns.server:#{null}}") String dnsServer,
-			@Value("${dns.parallel:16}") int parallelThreads) {
+			@Value("${dns.parallel:16}") int parallelThreads,
+			@Value("${dns.timeoutmillis:30000}") long timeoutMillis) {
 		
 		DnsLookupConfiguration ret = new DnsLookupConfiguration();
 		
@@ -150,6 +152,9 @@ public class ApplicationConfiguration {
 			
 			logger.debug("Using "+parallelThreads+" parallel DNS threads");
 			ret.setParallelThreads(parallelThreads);
+			
+			logger.debug("Using "+timeoutMillis+"ms as DNS timeout");
+			ret.setTimeoutMillis(timeoutMillis);
 		}
 		
 		return ret;
@@ -168,7 +173,7 @@ public class ApplicationConfiguration {
 	public DnsLookupService dnsLookupService(DnsLookupConfiguration config, DnsLookupHandler lookupHandler) {
 		ParallelDnsLookupService ret = new ParallelDnsLookupService();
 		ret.setParallelThreads(config.getParallelThreads());
-		ret.setTimeoutMillis(30000l);
+		ret.setTimeoutMillis(config.getTimeoutMillis());
 		ret.setLookupHandler(lookupHandler);
 		
 		return ret;

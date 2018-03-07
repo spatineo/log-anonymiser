@@ -1,6 +1,7 @@
 package com.spatineo.anonymisator.dns;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -12,6 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 public class ParallelDnsLookupService implements DnsLookupService, InitializingBean, DisposableBean {
 	private static Logger logger = LoggerFactory.getLogger(ParallelDnsLookupService.class);
 	
@@ -20,8 +24,10 @@ public class ParallelDnsLookupService implements DnsLookupService, InitializingB
 	
 	private int parallelThreads;
 	private long timeoutMillis;
+	private int maxCacheSize = -1;
 	
 	// Set up in afterPropertiesSet()
+	private ConcurrentMap<String, DnsLookupResult> lookupCache;
 	private ExecutorService executor;
 	
 	public void setParallelThreads(int parallelThreads) {
@@ -48,9 +54,31 @@ public class ParallelDnsLookupService implements DnsLookupService, InitializingB
 		return timeoutMillis;
 	}
 	
+	public void setMaxCacheSize(int maxCacheSize) {
+		this.maxCacheSize = maxCacheSize;
+	}
+	
+	public int getMaxCacheSize() {
+		return maxCacheSize;
+	}
+	
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		Cache<String, DnsLookupResult> tmp;
+		if (getMaxCacheSize() > 0) {
+			tmp = CacheBuilder.newBuilder()
+					.concurrencyLevel(getParallelThreads())
+					.maximumSize(getMaxCacheSize())
+					.build();
+		} else {
+			tmp = CacheBuilder.newBuilder()
+					.concurrencyLevel(getParallelThreads())
+					.build();
+		}
+		
+		lookupCache = tmp.asMap();
+		
 		logger.debug("Starting thread pool with "+getParallelThreads()+" threads");
 		executor = Executors.newFixedThreadPool(getParallelThreads(), new ThreadFactory() {
 			@Override
@@ -87,7 +115,12 @@ public class ParallelDnsLookupService implements DnsLookupService, InitializingB
 		}
 		@Override
 		public DnsLookupResult call() throws Exception {
-			return getLookupHandler().lookup(input, getTimeoutMillis(), TimeUnit.MILLISECONDS);
+			DnsLookupResult ret = lookupCache.get(input);
+			if (ret == null) {
+				ret = getLookupHandler().lookup(input);
+				lookupCache.putIfAbsent(input, ret);
+			}
+			return ret;
 		}
 	}
 

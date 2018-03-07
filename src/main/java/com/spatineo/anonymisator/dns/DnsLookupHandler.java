@@ -8,5 +8,5 @@ import java.util.concurrent.TimeUnit;
  * @author v2
  */
 public interface DnsLookupHandler {
-	public DnsLookupResult lookup(String addr, long timeout, TimeUnit unit) throws Exception;
+	public DnsLookupResult lookup(String addr) throws Exception;
 }

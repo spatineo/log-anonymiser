@@ -6,6 +6,7 @@ public class DnsLookupConfiguration {
 	private boolean enabled;
 	private List<String> servers;
 	private int parallelThreads;
+	private long timeoutMillis;
 	
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
@@ -30,6 +31,14 @@ public class DnsLookupConfiguration {
 	
 	public int getParallelThreads() {
 		return parallelThreads;
+	}
+	
+	public void setTimeoutMillis(long timeoutMillis) {
+		this.timeoutMillis = timeoutMillis;
+	}
+	
+	public long getTimeoutMillis() {
+		return timeoutMillis;
 	}
 	
 }
