@@ -3,9 +3,9 @@ package com.spatineo.anonymisator;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,16 +16,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import com.spatineo.anonymisator.dns.DnsLookupResult;
-import com.spatineo.anonymisator.dns.DnsLookupService;
-
 @SpringBootApplication
 public class Application implements ApplicationRunner
 {
 	private static Logger logger = LoggerFactory.getLogger(Application.class);
 	
 	@Autowired
-	private DnsLookupService foo;
+	private AnonymiserProcessor anonymisator;
 	
 	@Autowired
 	private ApplicationConfiguration configuration;
@@ -60,7 +57,7 @@ public class Application implements ApplicationRunner
 			return;
 		}
 		
-		/*
+		
 		String inputFileName = arguments.getNonOptionArgs().get(0);
 		String outputfileName = arguments.getNonOptionArgs().get(1);
 		
@@ -80,6 +77,7 @@ public class Application implements ApplicationRunner
 			return;
 		}
 		
+		/*
 		File outputFile = new File(outputfileName);
 		if (outputFile.exists()) {
 			System.err.println(inputFileName+": exists already!");
@@ -92,16 +90,12 @@ public class Application implements ApplicationRunner
 		}
 		*/
 		
-		/*
 		try (Reader input = new FileReader(inputFile);
-				Writer output = new FileWriter(outputFile)) {
+				Writer output = new OutputStreamWriter(System.out)
+				/*Writer output = new FileWriter(outputFile)*/) {
 			anonymisator.process(input, output);
+			output.flush();
 		}
-		*/
-		
-		Future<DnsLookupResult> tmp = foo.lookup("194.100.34.1");
-		DnsLookupResult res = tmp.get();
-		System.out.println(res.getReverseName());
-		
+	
 	}
 }

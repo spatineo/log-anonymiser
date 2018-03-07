@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
+import com.spatineo.anonymisator.dns.DisabledDnsLookupService;
 import com.spatineo.anonymisator.dns.DnsLookupConfiguration;
 import com.spatineo.anonymisator.dns.DnsLookupService;
 import com.spatineo.anonymisator.dns.DnsjavaLookupHandlerImpl;
@@ -115,6 +116,19 @@ public class ApplicationConfiguration {
 		return null;
 	}
 	
+	@Bean
+	public AnonymiserProcessor anonymisator(IpAddressAnonymiser ipAddressAnonymiser) {
+		AnonymiserProcessor ret = new AnonymiserProcessor();
+		ret.setIpAddressAnonymiser(ipAddressAnonymiser);
+		return ret;
+	}
+	
+	@Bean
+	public IpAddressAnonymiser ipAddressAnonymiser(DnsLookupService dnsLookupService) {
+		SpatineoLogAnalysisIpAddressAnonymiser ret = new SpatineoLogAnalysisIpAddressAnonymiser();
+		ret.setDnsLookupService(dnsLookupService);
+		return ret;
+	}
 	
 	@Bean
 	public DnsLookupConfiguration dnsLookup(
@@ -171,6 +185,10 @@ public class ApplicationConfiguration {
 	
 	@Bean
 	public DnsLookupService dnsLookupService(DnsLookupConfiguration config, DnsLookupHandler lookupHandler) {
+		if (!config.isEnabled()) {
+			return new DisabledDnsLookupService();
+		}
+		
 		ParallelDnsLookupService ret = new ParallelDnsLookupService();
 		ret.setParallelThreads(config.getParallelThreads());
 		ret.setTimeoutMillis(config.getTimeoutMillis());
