@@ -6,11 +6,33 @@
 	<artifactId>log-anonymisator</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
+	<organization>
+		<name>Spatineo</name>
+		<url>https://www.spatineo.com</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<id>sampov2</id>
+			<name>Sampo Savolainen</name>
+			<email>sampo.savolainen@spatineo.com</email>
+		</developer>
+	</developers>
+
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.0.0.RELEASE</version>
 	</parent>
+
+	<licenses>
+		<license>
+			<name>GNU General Public License, Version 3</name>
+			<url>http://www.gnu.org/licenses/gpl-3.0.html</url>
+			<distribution>manual</distribution>
+			<comments>A free, copyleft license for software and other kinds of works</comments>
+		</license>
+	</licenses>
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -47,14 +69,14 @@
 			<artifactId>mockito-core</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>commons-net</groupId>
 			<artifactId>commons-net</artifactId>
 			<version>3.6</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 
 	</dependencies>
 
