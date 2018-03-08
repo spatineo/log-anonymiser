@@ -2,11 +2,15 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>spatineo</groupId>
-	<artifactId>log-anonymisator</artifactId>
+	<groupId>com.spatineo</groupId>
+	<artifactId>log-anonymiser</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
 	<inceptionYear>2018</inceptionYear>
+
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>Command line tool for anonymising access log files</description>
+	<url>https://www.spatineo.com</url>
 
 	<organization>
 		<name>Spatineo Inc</name>
@@ -31,10 +35,15 @@
 		<license>
 			<name>GNU General Public License, Version 3</name>
 			<url>http://www.gnu.org/licenses/gpl-3.0.html</url>
-			<distribution>manual</distribution>
 			<comments>A free, copyleft license for software and other kinds of works</comments>
 		</license>
 	</licenses>
+
+	<scm>
+		<connection>scm:git:git://github.com/spatineo/log-anonymiser.git</connection>
+		<developerConnection>scm:git:ssh://github.com:spatineo/log-anonymiser.git</developerConnection>
+		<url>http://github.com/spatineo/log-anonymiser/tree/master</url>
+	</scm>
 
 	<properties>
 		<java.version>1.8</java.version>
