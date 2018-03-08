@@ -2,6 +2,7 @@ package com.spatineo.anonymisator;
 
 import static org.junit.Assert.*;
 
+import org.apache.commons.net.util.SubnetUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -57,5 +58,53 @@ public class IpAddressAnonymiserTest {
 		String result = ipAddressAnonymiser.anonymiseIp("192.168.1.218");
 		
 		assertEquals("192.168.1.192/26", result);
+	}
+	
+	@Test
+	public void testIpv4Masking7Bits() {
+		String addr = "192.168.1.255";
+		ipAddressAnonymiser.setIpv4BitsToAnonymize(7);
+		String result = ipAddressAnonymiser.anonymiseIp(addr);
+		
+		assertEquals("192.168.1.128/25", result);
+		
+		SubnetUtils tmp = new SubnetUtils(addr+"/25");
+		String foo = tmp.getInfo().getNetworkAddress()+"/25";
+		
+		assertEquals(result, foo);
+	}
+	
+	@Test
+	public void testAllAnonBitsAndMatchWithCommonsNet() {
+		String addr = "255.255.255.255";
+		
+		for (int i = 0; i <= 32; i++) {
+			String postfix = "/"+(32-i);
+			ipAddressAnonymiser.setIpv4BitsToAnonymize(i);
+			String result = ipAddressAnonymiser.anonymiseIp(addr);
+			
+			SubnetUtils tmp = new SubnetUtils(addr+postfix);
+			String foo = tmp.getInfo().getNetworkAddress()+postfix;
+			
+			assertEquals(result, foo);
+		}
+	}
+	
+	@Test
+	public void testIpv6Masking80Bits() {
+		ipAddressAnonymiser.setIpv6BitsToAnonymize(80);
+		
+		String result = ipAddressAnonymiser.anonymiseIp("fe80::f043:57ff:fe35:77c7");
+		
+		assertEquals("fe80::/48", result);
+	}
+	
+	@Test
+	public void testIpv6Masking80BitsWwwGoogleCom() { 
+		ipAddressAnonymiser.setIpv6BitsToAnonymize(80);
+		
+		String result = ipAddressAnonymiser.anonymiseIp("2a00:1450:400f:80c::2004");
+		
+		assertEquals("2a00:1450:400f::/48", result);
 	}
 }

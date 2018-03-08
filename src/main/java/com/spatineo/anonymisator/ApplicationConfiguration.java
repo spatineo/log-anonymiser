@@ -38,12 +38,13 @@ public class ApplicationConfiguration {
 		tmp.put("dns.timeoutmillis", "DNS lookup timeout in milliseconds (default 30000)");
 		tmp.put("threads", "How many concurrent threads are used in parallel (default 32)");
 		tmp.put("mask.ipv4", "How many bits in IPv4 addressess to mask / anonymise (default 8)");
+		tmp.put("mask.ipv6", "How many bits in IPv6 addressess to mask / anonymise (default 80)");
 		tmp.put("help", "Display this message");
 		
 		legalParameters = Collections.unmodifiableMap(tmp);
 		
 		legalParametersRequireValue = Collections.unmodifiableSet(
-				new HashSet<>(Arrays.asList("dns.server", "mask.ipv4")));
+				new HashSet<>(Arrays.asList("dns.server", "mask.ipv4", "mask.ipv6")));
 	}
 	
 	/**
@@ -140,7 +141,8 @@ public class ApplicationConfiguration {
 			@Value("${dns.server:#{null}}") String dnsServer,
 			@Value("${dns.timeoutmillis:30000}") long timeoutMillis,
 			@Value("${threads:32}") int parallelThreads,
-			@Value("${mask.ipv4:8}") int ipv4mask)
+			@Value("${mask.ipv4:8}") int ipv4mask,
+			@Value("${mask.ipv6:80}") int ipv6mask)
 	{
 		
 		AnonymiserConfiguration ret = new AnonymiserConfiguration();
@@ -183,8 +185,15 @@ public class ApplicationConfiguration {
 		if (ipv4mask < 0 || ipv4mask > 32) {
 			throw new IllegalArgumentException("Illegal IPv4 mask "+ipv4mask);
 		}
-		logger.debug("Anonymising IPv4 addresses by removing "+ipv4mask+" last bits");
+		logger.debug("Anonymising IPv4 addresses by removing last "+ipv4mask+" bits");
 		ret.setIpv4BitsToAnonymize(ipv4mask);
+		
+		
+		if (ipv6mask < 0 || ipv6mask > 128) {
+			throw new IllegalArgumentException("Illegal IPv6 mask "+ipv6mask);
+		}
+		logger.debug("Anonymising IPv6 addresses by removing last "+ipv6mask+" bits");
+		ret.setIpv6BitsToAnonymize(ipv6mask);
 		
 		return ret;
 	}

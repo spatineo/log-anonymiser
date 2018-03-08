@@ -8,6 +8,7 @@ public class AnonymiserConfiguration {
 	private int parallelThreads;
 	private long timeoutMillis;
 	private int ipv4BitsToAnonymize;
+	private int ipv6BitsToAnonymize;
 	
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
@@ -47,5 +48,13 @@ public class AnonymiserConfiguration {
 	
 	public int getIpv4BitsToAnonymize() {
 		return ipv4BitsToAnonymize;
+	}
+	
+	public void setIpv6BitsToAnonymize(int ipv6BitsToAnonymize) {
+		this.ipv6BitsToAnonymize = ipv6BitsToAnonymize;
+	}
+	
+	public int getIpv6BitsToAnonymize() {
+		return ipv6BitsToAnonymize;
 	}
 }
