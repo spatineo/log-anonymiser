@@ -62,6 +62,28 @@ public class AnonymiserProcessor {
 	
 	
 	public void process(Reader in, Writer out) throws Exception {
+		if (getParallelThreads() > 1) {
+			logger.info("Using multiprocessor mode");
+			processParallel(in, out);
+		} else {
+			logger.info("Using single-thread mode");
+			processSingleThread(in, out);
+		}
+	}
+	
+	private void processSingleThread(Reader in, Writer out) throws Exception {
+		BufferedReader br = new BufferedReader(in);
+		String line;
+		
+		
+		while ((line = br.readLine()) != null) {
+			String processed = process(line);
+			out.write(processed);
+			out.write("\n");
+		}
+	}
+
+	void processParallel(Reader in, Writer out) throws Exception {
 		ExecutorService executor = Executors.newFixedThreadPool(getParallelThreads(), new ThreadFactory() {
 			@Override
 			public Thread newThread(Runnable r) {

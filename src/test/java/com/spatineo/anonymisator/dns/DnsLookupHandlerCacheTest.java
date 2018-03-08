@@ -10,18 +10,20 @@ import org.xbill.DNS.Record;
 import org.xbill.DNS.Resolver;
 import org.xbill.DNS.Section;
 
+import com.spatineo.anonymisator.AnonymiserConfiguration;
+
 
 public class DnsLookupHandlerCacheTest {
 	private DnsjavaLookupHandlerImpl cachingLookupHandler;
 	
 	@Before
 	public void setUp() throws Exception {
-		DnsLookupConfiguration configuration = new DnsLookupConfiguration();
+		AnonymiserConfiguration configuration = new AnonymiserConfiguration();
 		configuration.setParallelThreads(1);
 		
 		cachingLookupHandler = new DnsjavaLookupHandlerImpl();
 		cachingLookupHandler.setMaxCacheSize(10);
-		cachingLookupHandler.setDnsLookupConfiguration(configuration);
+		cachingLookupHandler.setAnonymiserConfiguration(configuration);
 		
 		cachingLookupHandler.setResolver(mock(Resolver.class));
 		

@@ -20,7 +20,6 @@ import org.xbill.DNS.ExtendedResolver;
 import org.xbill.DNS.Resolver;
 
 import com.spatineo.anonymisator.dns.DisabledDnsLookupHandler;
-import com.spatineo.anonymisator.dns.DnsLookupConfiguration;
 import com.spatineo.anonymisator.dns.DnsjavaLookupHandlerImpl;
 import com.spatineo.anonymisator.dns.DnsLookupHandler;
 
@@ -36,13 +35,15 @@ public class ApplicationConfiguration {
 		
 		tmp.put("dns.disabled", "Disable DNS lookups (enabled by default)");
 		tmp.put("dns.server", "DNS server(s) to use as a comma-delimited list, for example --dns.server=8.8.8.8,4.4.4.4 for Google public DNS (use system settings by default)");
-		tmp.put("dns.parallel", "How many concurrent DNS lookups may be done in parallel (default 16)");
 		tmp.put("dns.timeoutmillis", "DNS lookup timeout in milliseconds (default 30000)");
+		tmp.put("threads", "How many concurrent threads are used in parallel (default 32)");
+		tmp.put("mask.ipv4", "How many bits in IPv4 addressess to mask / anonymise (default 8)");
 		tmp.put("help", "Display this message");
 		
 		legalParameters = Collections.unmodifiableMap(tmp);
 		
-		legalParametersRequireValue = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("dns.server")));
+		legalParametersRequireValue = Collections.unmodifiableSet(
+				new HashSet<>(Arrays.asList("dns.server", "mask.ipv4")));
 	}
 	
 	/**
@@ -108,7 +109,7 @@ public class ApplicationConfiguration {
 				}
 				
 				if (values.size() > 1) {
-					return "Please only spsecify one value for parameter "+p;
+					return "Please only specify one value for parameter "+p;
 				}
 			}
 		}
@@ -117,7 +118,7 @@ public class ApplicationConfiguration {
 	}
 	
 	@Bean
-	public AnonymiserProcessor anonymisator(IpAddressAnonymiser ipAddressAnonymiser, DnsLookupConfiguration configuration) {
+	public AnonymiserProcessor anonymisator(IpAddressAnonymiser ipAddressAnonymiser, AnonymiserConfiguration configuration) {
 		AnonymiserProcessor ret = new AnonymiserProcessor();
 		ret.setIpAddressAnonymiser(ipAddressAnonymiser);
 		ret.setParallelThreads(configuration.getParallelThreads());
@@ -126,24 +127,30 @@ public class ApplicationConfiguration {
 	}
 	
 	@Bean
-	public IpAddressAnonymiser ipAddressAnonymiser(DnsLookupHandler dnsLookupHandler) {
+	public IpAddressAnonymiser ipAddressAnonymiser(DnsLookupHandler dnsLookupHandler, AnonymiserConfiguration configuration) {
 		SpatineoLogAnalysisIpAddressAnonymiser ret = new SpatineoLogAnalysisIpAddressAnonymiser();
+		ret.setIpv4BitsToAnonymize(configuration.getIpv4BitsToAnonymize());
 		ret.setDnsLookupHandler(dnsLookupHandler);
 		return ret;
 	}
 	
 	@Bean
-	public DnsLookupConfiguration dnsLookup(
+	public AnonymiserConfiguration dnsLookup(
 			@Value("${dns.disabled:#{null}}") String nodns,
 			@Value("${dns.server:#{null}}") String dnsServer,
-			@Value("${dns.parallel:16}") int parallelThreads,
-			@Value("${dns.timeoutmillis:30000}") long timeoutMillis) {
+			@Value("${dns.timeoutmillis:30000}") long timeoutMillis,
+			@Value("${threads:32}") int parallelThreads,
+			@Value("${mask.ipv4:8}") int ipv4mask)
+	{
 		
-		DnsLookupConfiguration ret = new DnsLookupConfiguration();
+		AnonymiserConfiguration ret = new AnonymiserConfiguration();
 		
 		if (nodns != null) {
 			logger.debug("Disabling DNS lookup");
 			ret.setEnabled(false);
+			
+			// Set threads since this is needed for thread pool configuration
+			ret.setParallelThreads(1);
 			
 		} else {
 			logger.debug("Enabling DNS lookup");
@@ -166,18 +173,24 @@ public class ApplicationConfiguration {
 				ret.setServers(tmp);
 			}
 			
-			logger.debug("Using "+parallelThreads+" parallel DNS threads");
-			ret.setParallelThreads(parallelThreads);
-			
 			logger.debug("Using "+timeoutMillis+"ms as DNS timeout");
 			ret.setTimeoutMillis(timeoutMillis);
+			 
+			logger.debug("Using "+parallelThreads+" parallel DNS threads");
+			ret.setParallelThreads(parallelThreads);
 		}
+		
+		if (ipv4mask < 0 || ipv4mask > 32) {
+			throw new IllegalArgumentException("Illegal IPv4 mask "+ipv4mask);
+		}
+		logger.debug("Anonymising IPv4 addresses by removing "+ipv4mask+" last bits");
+		ret.setIpv4BitsToAnonymize(ipv4mask);
 		
 		return ret;
 	}
 
 	@Bean
-	public Resolver resolver(DnsLookupConfiguration configuration) throws Exception {
+	public Resolver resolver(AnonymiserConfiguration configuration) throws Exception {
 		Resolver resolver;
 		List<String> servers = configuration.getServers();
 		if (servers == null) {
@@ -195,13 +208,13 @@ public class ApplicationConfiguration {
 	}
 	
 	@Bean
-	public DnsLookupHandler dnsLookupHandler(DnsLookupConfiguration config, Resolver resolver) {
+	public DnsLookupHandler dnsLookupHandler(AnonymiserConfiguration config, Resolver resolver) {
 		if (!config.isEnabled()) {
 			return new DisabledDnsLookupHandler();
 		}
 		
 		DnsjavaLookupHandlerImpl ret = new DnsjavaLookupHandlerImpl();
-		ret.setDnsLookupConfiguration(config);
+		ret.setAnonymiserConfiguration(config);
 		ret.setResolver(resolver);
 		
 		return ret;

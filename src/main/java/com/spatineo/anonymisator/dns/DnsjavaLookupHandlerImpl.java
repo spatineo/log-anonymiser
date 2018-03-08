@@ -14,17 +14,17 @@ import org.xbill.DNS.Type;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.spatineo.anonymisator.AnonymiserConfiguration;
 
 public class DnsjavaLookupHandlerImpl implements DnsLookupHandler, InitializingBean {
 	
-	private DnsLookupConfiguration dnsLookupConfiguration;
+	private AnonymiserConfiguration anonymiserConfiguration;
 	
 	private int maxCacheSize = -1;
 	private Resolver resolver;
 	
 	// Set up in afterPropertiesSet()
 	private ConcurrentMap<String, DnsLookupResult> lookupCache;
-	
 	
 	
 	public void setMaxCacheSize(int maxCacheSize) {
@@ -43,12 +43,12 @@ public class DnsjavaLookupHandlerImpl implements DnsLookupHandler, InitializingB
 		return resolver;
 	}
 	
-	public void setDnsLookupConfiguration(DnsLookupConfiguration dnsLookupConfiguration) {
-		this.dnsLookupConfiguration = dnsLookupConfiguration;
+	public void setAnonymiserConfiguration(AnonymiserConfiguration anonymiserConfiguration) {
+		this.anonymiserConfiguration = anonymiserConfiguration;
 	}
 	
-	public DnsLookupConfiguration getDnsLookupConfiguration() {
-		return dnsLookupConfiguration;
+	public AnonymiserConfiguration getAnonymiserConfiguration() {
+		return anonymiserConfiguration;
 	}
 	
 	@Override
@@ -57,12 +57,12 @@ public class DnsjavaLookupHandlerImpl implements DnsLookupHandler, InitializingB
 		Cache<String, DnsLookupResult> tmp;
 		if (getMaxCacheSize() > 0) {
 			tmp = CacheBuilder.newBuilder()
-					.concurrencyLevel(getDnsLookupConfiguration().getParallelThreads())
+					.concurrencyLevel(getAnonymiserConfiguration().getParallelThreads())
 					.maximumSize(getMaxCacheSize())
 					.build();
 		} else {
 			tmp = CacheBuilder.newBuilder()
-					.concurrencyLevel(getDnsLookupConfiguration().getParallelThreads())
+					.concurrencyLevel(getAnonymiserConfiguration().getParallelThreads())
 					.build();
 		}
 		

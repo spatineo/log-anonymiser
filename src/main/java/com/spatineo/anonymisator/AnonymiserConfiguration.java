@@ -1,12 +1,13 @@
-package com.spatineo.anonymisator.dns;
+package com.spatineo.anonymisator;
 
 import java.util.List;
 
-public class DnsLookupConfiguration {
+public class AnonymiserConfiguration {
 	private boolean enabled;
 	private List<String> servers;
 	private int parallelThreads;
 	private long timeoutMillis;
+	private int ipv4BitsToAnonymize;
 	
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
@@ -40,4 +41,11 @@ public class DnsLookupConfiguration {
 		return timeoutMillis;
 	}
 	
+	public void setIpv4BitsToAnonymize(int ipv4BitsToAnonymize) {
+		this.ipv4BitsToAnonymize = ipv4BitsToAnonymize;
+	}
+	
+	public int getIpv4BitsToAnonymize() {
+		return ipv4BitsToAnonymize;
+	}
 }
