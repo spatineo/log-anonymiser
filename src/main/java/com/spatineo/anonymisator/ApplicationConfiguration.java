@@ -16,13 +16,13 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
+import org.xbill.DNS.ExtendedResolver;
+import org.xbill.DNS.Resolver;
 
-import com.spatineo.anonymisator.dns.DisabledDnsLookupService;
+import com.spatineo.anonymisator.dns.DisabledDnsLookupHandler;
 import com.spatineo.anonymisator.dns.DnsLookupConfiguration;
-import com.spatineo.anonymisator.dns.DnsLookupService;
 import com.spatineo.anonymisator.dns.DnsjavaLookupHandlerImpl;
 import com.spatineo.anonymisator.dns.DnsLookupHandler;
-import com.spatineo.anonymisator.dns.ParallelDnsLookupService;
 
 @Configuration
 public class ApplicationConfiguration {
@@ -117,16 +117,18 @@ public class ApplicationConfiguration {
 	}
 	
 	@Bean
-	public AnonymiserProcessor anonymisator(IpAddressAnonymiser ipAddressAnonymiser) {
+	public AnonymiserProcessor anonymisator(IpAddressAnonymiser ipAddressAnonymiser, DnsLookupConfiguration configuration) {
 		AnonymiserProcessor ret = new AnonymiserProcessor();
 		ret.setIpAddressAnonymiser(ipAddressAnonymiser);
+		ret.setParallelThreads(configuration.getParallelThreads());
+		ret.setTimeoutMillis(configuration.getTimeoutMillis());
 		return ret;
 	}
 	
 	@Bean
-	public IpAddressAnonymiser ipAddressAnonymiser(DnsLookupService dnsLookupService) {
+	public IpAddressAnonymiser ipAddressAnonymiser(DnsLookupHandler dnsLookupHandler) {
 		SpatineoLogAnalysisIpAddressAnonymiser ret = new SpatineoLogAnalysisIpAddressAnonymiser();
-		ret.setDnsLookupService(dnsLookupService);
+		ret.setDnsLookupHandler(dnsLookupHandler);
 		return ret;
 	}
 	
@@ -174,25 +176,33 @@ public class ApplicationConfiguration {
 		return ret;
 	}
 
-	
 	@Bean
-	public DnsLookupHandler dnsLookupHanlder(DnsLookupConfiguration config) {
-		DnsjavaLookupHandlerImpl ret = new DnsjavaLookupHandlerImpl();
-		ret.setDnsLookupConfiguration(config);
-		return ret;
-	}
-	
-	
-	@Bean
-	public DnsLookupService dnsLookupService(DnsLookupConfiguration config, DnsLookupHandler lookupHandler) {
-		if (!config.isEnabled()) {
-			return new DisabledDnsLookupService();
+	public Resolver resolver(DnsLookupConfiguration configuration) throws Exception {
+		Resolver resolver;
+		List<String> servers = configuration.getServers();
+		if (servers == null) {
+			resolver = new ExtendedResolver();
+		} else {
+			resolver = new ExtendedResolver(servers.toArray(new String[]{}));
 		}
 		
-		ParallelDnsLookupService ret = new ParallelDnsLookupService();
-		ret.setParallelThreads(config.getParallelThreads());
-		ret.setTimeoutMillis(config.getTimeoutMillis());
-		ret.setLookupHandler(lookupHandler);
+		long timeout = configuration.getTimeoutMillis();
+		long millis = timeout % 1000;
+		long secs = (timeout - millis) / 1000l;
+		resolver.setTimeout((int) secs, (int) millis);
+		
+		return resolver;
+	}
+	
+	@Bean
+	public DnsLookupHandler dnsLookupHandler(DnsLookupConfiguration config, Resolver resolver) {
+		if (!config.isEnabled()) {
+			return new DisabledDnsLookupHandler();
+		}
+		
+		DnsjavaLookupHandlerImpl ret = new DnsjavaLookupHandlerImpl();
+		ret.setDnsLookupConfiguration(config);
+		ret.setResolver(resolver);
 		
 		return ret;
 	}

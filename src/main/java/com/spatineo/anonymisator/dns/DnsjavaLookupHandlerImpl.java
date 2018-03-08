@@ -1,10 +1,9 @@
 package com.spatineo.anonymisator.dns;
 
-import java.util.List;
+import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.xbill.DNS.DClass;
-import org.xbill.DNS.ExtendedResolver;
 import org.xbill.DNS.Message;
 import org.xbill.DNS.Name;
 import org.xbill.DNS.Record;
@@ -13,11 +12,36 @@ import org.xbill.DNS.ReverseMap;
 import org.xbill.DNS.Section;
 import org.xbill.DNS.Type;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 public class DnsjavaLookupHandlerImpl implements DnsLookupHandler, InitializingBean {
+	
 	private DnsLookupConfiguration dnsLookupConfiguration;
 	
-	// Set up in afterPropertiesSet()
+	private int maxCacheSize = -1;
 	private Resolver resolver;
+	
+	// Set up in afterPropertiesSet()
+	private ConcurrentMap<String, DnsLookupResult> lookupCache;
+	
+	
+	
+	public void setMaxCacheSize(int maxCacheSize) {
+		this.maxCacheSize = maxCacheSize;
+	}
+	
+	public int getMaxCacheSize() {
+		return maxCacheSize;
+	}
+	
+	public void setResolver(Resolver resolver) {
+		this.resolver = resolver;
+	}
+	
+	public Resolver getResolver() {
+		return resolver;
+	}
 	
 	public void setDnsLookupConfiguration(DnsLookupConfiguration dnsLookupConfiguration) {
 		this.dnsLookupConfiguration = dnsLookupConfiguration;
@@ -29,43 +53,62 @@ public class DnsjavaLookupHandlerImpl implements DnsLookupHandler, InitializingB
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		List<String> servers = getDnsLookupConfiguration().getServers();
-		if (servers == null) {
-			resolver = new ExtendedResolver();
+		// Cache
+		Cache<String, DnsLookupResult> tmp;
+		if (getMaxCacheSize() > 0) {
+			tmp = CacheBuilder.newBuilder()
+					.concurrencyLevel(getDnsLookupConfiguration().getParallelThreads())
+					.maximumSize(getMaxCacheSize())
+					.build();
 		} else {
-			resolver = new ExtendedResolver(servers.toArray(new String[]{}));
+			tmp = CacheBuilder.newBuilder()
+					.concurrencyLevel(getDnsLookupConfiguration().getParallelThreads())
+					.build();
 		}
 		
-		long timeout = getDnsLookupConfiguration().getTimeoutMillis();
-		long millis = timeout % 1000;
-		long secs = (timeout - millis) / 1000l;
-		resolver.setTimeout((int) secs, (int) millis);	
+		lookupCache = tmp.asMap();
 	}
 	
-	// TODO: ipv6
 	@Override
 	public DnsLookupResult lookup(String addr) throws Exception {
+		
+		DnsLookupResult ret = lookupCache.get(addr);
+		if (ret == null) {
+			ret = lookupFromDNS(addr);
+			lookupCache.putIfAbsent(addr, ret);
+		}
+		return ret;
+		
+	}
+
+	// TODO: ipv6
+	// Visibility for tests only
+	DnsLookupResult lookupFromDNS(String addr) throws Exception {
 		Name name = ReverseMap.fromAddress(addr);
 		int type = Type.PTR;
 		int dclass = DClass.IN;
 		Record rec = Record.newRecord(name, type, dclass);
 		Message query = Message.newQuery(rec);
 		
-		Message response = resolver.send(query);
+		Message response = getResolver().send(query);
 
+		DnsLookupResult ret = new DnsLookupResult();
+		
 		Record[] answers = response.getSectionArray(Section.ANSWER);
 		if (answers.length == 0) {
-			return null;
+			ret.setSuccess(false);
+			return ret;
 		}
 		
-		DnsLookupResult ret = new DnsLookupResult();
 		String reverseName = answers[0].rdataToString();
+		// Remove end dot
 		if (reverseName != null) {
 			while (reverseName.length() > 0 && reverseName.charAt(reverseName.length()-1) == '.') {
 				reverseName = reverseName.substring(0, reverseName.length()-1);
 			}
 		}
 		ret.setReverseName(reverseName);
+		ret.setSuccess(true);
 		return ret;
 	}
 

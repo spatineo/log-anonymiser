@@ -24,7 +24,6 @@ public class DnsLookupConfiguration {
 		return servers;
 	}
 	
-	
 	public void setParallelThreads(int parallelThreads) {
 		this.parallelThreads = parallelThreads;
 	}
