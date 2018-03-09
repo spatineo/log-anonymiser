@@ -2,7 +2,7 @@
 
 This tool is a command line anonymiser for access log files. The tool searches for IPv4 and IPv6 addresses in input files and anonymises them by removing a configurable number of bits from the end of the file. In addition to just anonymising, the tool also performs a reverse DNS lookup of the original address and stores the first level subdomain of the address.
 
-The tool has been developed by Spatineo Inc specifically for use with [Spatineo Monitor](https://www.spatineo.com/monitor/) log analysis. The tool is released under GPLv3 to allow our customers and others to build and share developments of the tool.
+The tool has been developed by Spatineo Inc specifically for use with [Spatineo Monitor](https://www.spatineo.com/monitor/) log analysis. The tool is released under GPLv3 to allow our users and others to build and share developments of the tool.
 
 Source code is available at [GitHub](https://github.com/spatineo/log-anonymiser)
 
@@ -26,6 +26,10 @@ Usage: java -jar log-anonymisator.jar [options] inputfile outputfile
 	  --mask.ipv6=value    How many bits in IPv6 addressess to mask / anonymise (default 80)
 	  --threads            How many concurrent threads are used in parallel (default 32)
 </pre>
+
+## Anonymising logs for Spatineo Monitor
+
+Users of Spatineo Monitor should use this tool to process their log files before sending the logs to Spatineo. This tool can be easily integrated into the script that automates transfer of log files to Spatineo. The only change required to the usual upload script is that anonymising is done before sending the file.
 
 # How it works
 
