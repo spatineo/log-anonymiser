@@ -218,7 +218,7 @@ public class AnonymiserProcessor {
 		return ret;
 	}
 
-	public String process(String line) {
+	String process(String line) {
 		
 		StringBuffer output = new StringBuffer();
 		

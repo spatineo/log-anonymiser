@@ -124,6 +124,24 @@ public class IpAddressAnonymiserTest {
 	}
 	
 	@Test
+	public void testIpv6Masking80BitsZerosInSource() {
+		ipAddressAnonymiser.setIpv6BitsToAnonymize(80);
+		
+		String result = ipAddressAnonymiser.anonymiseIp("fe80:0000:0000:0000:f043:57ff:fe35:77c7");
+		
+		assertEquals("fe80::/48", result);
+	}
+	
+	@Test
+	public void testIpv6Masking80BitsPartlyInUpperCase() {
+		ipAddressAnonymiser.setIpv6BitsToAnonymize(80);
+		
+		String result = ipAddressAnonymiser.anonymiseIp("fE80:0000:0000:0000:f043:57Ff:fe35:77C7");
+		
+		assertEquals("fe80::/48", result);
+	}
+	
+	@Test
 	public void testIpv6Masking80BitsWwwGoogleCom() { 
 		ipAddressAnonymiser.setIpv6BitsToAnonymize(80);
 		
