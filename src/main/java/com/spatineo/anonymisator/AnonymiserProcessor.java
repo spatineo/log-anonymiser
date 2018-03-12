@@ -161,11 +161,11 @@ public class AnonymiserProcessor {
 		}
 	}
 
-	private Thread startInputThread(ExecutorService executor, Semaphore semaphore, ConcurrentLinkedQueue<Future<String>> processQueue, AtomicBoolean allInputRead, Reader in) throws IOException {
-		BufferedReader br = new BufferedReader(in);
+	private Thread startInputThread(final ExecutorService executor, final Semaphore semaphore, final ConcurrentLinkedQueue<Future<String>> processQueue, final AtomicBoolean allInputRead, Reader in) throws IOException {
+		final BufferedReader br = new BufferedReader(in);
 
 		while (semaphore.tryAcquire()) {
-			String line = br.readLine();
+			final String line = br.readLine();
 		 
 			if (line == null) {
 				logger.debug("Input file has less rows than parallel threads, no AnonymiserInputThread necessary");
@@ -189,7 +189,7 @@ public class AnonymiserProcessor {
 			public void run() {
 				try {
 					while (true) {
-						String tmp = br.readLine();
+						final String tmp = br.readLine();
 						if (tmp == null) {
 							logger.trace("End of file, exiting thread");
 							return;
