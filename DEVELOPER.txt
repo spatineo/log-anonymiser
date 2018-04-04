@@ -1,0 +1,11 @@
+Developer notes for log-anonymiser
+----------------------------------
+
+A working combination:
+ - Oracle JDK 1.8.0_51
+ - Apache Maven 3.0.4
+
+To deploy a snapshot release:
+
+  mvn clean deploy
+
