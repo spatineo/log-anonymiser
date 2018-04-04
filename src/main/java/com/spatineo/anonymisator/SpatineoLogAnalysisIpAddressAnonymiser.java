@@ -45,6 +45,8 @@ public class SpatineoLogAnalysisIpAddressAnonymiser implements IpAddressAnonymis
 	private String ipv4MaskPostfix;
 	private String ipv6MaskPostfix;
 	
+	private boolean allowFullPrivateAddresses;
+	
 	public void setDnsLookupHandler(DnsLookupHandler dnsLookupHandler) {
 		this.dnsLookupHandler = dnsLookupHandler;
 	}
@@ -71,6 +73,14 @@ public class SpatineoLogAnalysisIpAddressAnonymiser implements IpAddressAnonymis
 		return ipv6BitsToAnonymize;
 	}
 	
+	public void setAllowFullPrivateAddresses(boolean allowFullPrivateAddresses) {
+		this.allowFullPrivateAddresses = allowFullPrivateAddresses;
+	}
+	
+	public boolean isAllowFullPrivateAddresses() {
+		return allowFullPrivateAddresses;
+	}
+	
 	@Override
 	public String processAddressString(String address) {
 		String domainName = null;
@@ -86,7 +96,7 @@ public class SpatineoLogAnalysisIpAddressAnonymiser implements IpAddressAnonymis
 			}
 			
 		} catch(Exception e) {
-			logger.error("Error in reverse DNS lookup", e);
+			logger.error("Unknown error while processing address "+address+", treating as missing DNS name. Please report full error message with stack trace along with version of software to https://github.com/spatineo/log-anonymiser/issues", e);
 		}
 		
 		return produceOutput(domainName, anonymisedIp);
@@ -104,13 +114,33 @@ public class SpatineoLogAnalysisIpAddressAnonymiser implements IpAddressAnonymis
 	}
 	
 	/**
-	 * Convert FQDNs to top private domaines, i.e. www.google.co.uk => google.co.uk
+	 * Convert FQDNs to top private domains, i.e. www.google.co.uk => google.co.uk
+	 * For addresses not in public suffixes (like .com, .net, etc), this will either return null
+	 * or the full address depending on isAllowFullPrivateAddresses(). 
 	 * 
-	 * @param dnsName
-	 * @return
+	 * @param dnsName Fully Qualified Domain Name (FQDN)
+	 * @return Returns the domain name suitable for including in the resulting anonymised log file, or null
+	 *         if this address cannot be used at all
 	 */
 	String identifyDomainName(String dnsName) {
-		InternetDomainName idn = InternetDomainName.from(dnsName);
+		InternetDomainName idn;
+		try {
+			idn = InternetDomainName.from(dnsName);
+		} catch(IllegalArgumentException iae) {
+			if (logger.isTraceEnabled()) {
+				logger.trace("Illegal DNS name "+dnsName, iae);
+			}
+			
+			return null;
+		}
+		if (!idn.hasPublicSuffix()) {
+			if (isAllowFullPrivateAddresses()) {
+				return dnsName;
+			} else {
+				// topPrivateDomain() would fail for non-public suffix addresses
+				return null;
+			}
+		}
 		return idn.topPrivateDomain().toString();
 	}
 	

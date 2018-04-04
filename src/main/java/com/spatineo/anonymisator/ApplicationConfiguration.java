@@ -57,6 +57,7 @@ public class ApplicationConfiguration {
 	static {
 		Map<String, String> tmp = new HashMap<>();
 		
+		tmp.put("dns.allowprivate", "Return full private DNS names (e.g. hello.local) when DNS returns them");
 		tmp.put("dns.disabled", "Disable DNS lookups (enabled by default)");
 		tmp.put("dns.server", "DNS server(s) to use as a comma-delimited list, for example --dns.server=8.8.8.8,4.4.4.4 for Google public DNS (use system settings by default)");
 		tmp.put("dns.timeoutmillis", "DNS lookup timeout in milliseconds (default 30000)");
@@ -157,11 +158,13 @@ public class ApplicationConfiguration {
 		ret.setIpv4BitsToAnonymize(configuration.getIpv4BitsToAnonymize());
 		ret.setIpv6BitsToAnonymize(configuration.getIpv6BitsToAnonymize());
 		ret.setDnsLookupHandler(dnsLookupHandler);
+		ret.setAllowFullPrivateAddresses(configuration.isAllowFullPrivateAddresses());
 		return ret;
 	}
 	
 	@Bean
 	public AnonymiserConfiguration dnsLookup(
+			@Value("${dns.allowprivate:#{null}}") String allowFullPrivateAddresses,
 			@Value("${dns.disabled:#{null}}") String nodns,
 			@Value("${dns.server:#{null}}") String dnsServer,
 			@Value("${dns.timeoutmillis:30000}") long timeoutMillis,
@@ -171,6 +174,9 @@ public class ApplicationConfiguration {
 	{
 		
 		AnonymiserConfiguration ret = new AnonymiserConfiguration();
+		
+		ret.setAllowFullPrivateAddresses(allowFullPrivateAddresses != null);
+		logger.debug("Allow full private addresses = "+ret.isAllowFullPrivateAddresses());
 		
 		if (nodns != null) {
 			logger.debug("Disabling DNS lookup");

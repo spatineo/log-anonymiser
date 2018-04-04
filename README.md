@@ -15,9 +15,10 @@ The log anonymiser is developed using Java and requires Java 8 to run.
 When running the anonymiser, you need to specify the input and output files along with parameters. Default parameters will work for most users.
 
 <pre>
-> java -jar log-anonymiser-0.0.1.jar
+> java -jar log-anonymiser-0.0.3.jar
 Usage: java -jar log-anonymisator.jar [options] inputfile outputfile
 	The following options are supported:
+	  --dns.allowprivate   Return full private DNS names (e.g. hello.local) when DNS returns them
 	  --dns.disabled       Disable DNS lookups (enabled by default)
 	  --dns.server=value   DNS server(s) to use as a comma-delimited list, for example --dns.server=8.8.8.8,4.4.4.4 for Google public DNS (use system settings by default)
 	  --dns.timeoutmillis  DNS lookup timeout in milliseconds (default 30000)
@@ -34,6 +35,8 @@ Users of Spatineo Monitor should use this tool to process their log files before
 # How it works
 
 This tool works by detecting IP addresses in text files. It reads a file, anonymises the IP addresses and writes the output into a separate file. All IP addresses found on a single row will be anonymised.  This approach means the tool is compatible with almost all access log file formats.
+
+When the tool resolves reverse DNS names, it will only return the top level public domain name (e.g. google.com for anything.google.com). This simplification is done only for DNS names with publicly available suffixes like com, net, de, co.uk, etc. DNS names with non-public suffixes are disregarded unless the flag --dns.allowprivate is used. If the flag is used, full DNS names without simplification are produced in the output log file.
 
 ## Example
 

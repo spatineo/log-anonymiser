@@ -33,6 +33,7 @@ public class AnonymiserConfiguration {
 	private long timeoutMillis;
 	private int ipv4BitsToAnonymize;
 	private int ipv6BitsToAnonymize;
+	private boolean allowFullPrivateAddresses;
 	
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
@@ -80,5 +81,13 @@ public class AnonymiserConfiguration {
 	
 	public int getIpv6BitsToAnonymize() {
 		return ipv6BitsToAnonymize;
+	}
+	
+	public void setAllowFullPrivateAddresses(boolean allowFullPrivateAddresses) {
+		this.allowFullPrivateAddresses = allowFullPrivateAddresses;
+	}
+	
+	public boolean isAllowFullPrivateAddresses() {
+		return allowFullPrivateAddresses;
 	}
 }
