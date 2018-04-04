@@ -28,6 +28,8 @@ Usage: java -jar log-anonymisator.jar [options] inputfile outputfile
 	  --threads            How many concurrent threads are used in parallel (default 32)
 </pre>
 
+You can increase logging by setting the environment variable _JAVA_OPTIONS to "-Dlogging.level.com.spatineo=DEBUG" (or TRACE). This affects logging from this tool, but you can also change the logging level of other components by specifying a different Java package than com.spatineo.
+
 ## Anonymising logs for Spatineo Monitor
 
 Users of Spatineo Monitor should use this tool to process their log files before sending the logs to Spatineo. This tool can be easily integrated into the script that automates transfer of log files to Spatineo. The only change required to the usual upload script is that anonymising is done before sending the file.
