@@ -162,4 +162,19 @@ public class AnonymisatorIPv6Test {
 		
 		assertEquals("--founditX-- hello world --foundit--", foo);
 	}
+	
+
+	@Test
+	public void testXForwardedForCommas() throws Exception {
+		String foo = anonymisator.process("Hello 2001:0db8:85a3:0000:0000:8a2e:0370:7334,2001:0db8:85a3:0000:0000:8a2e:0370:7334,2001:0db8:85a3:0000:0000:8a2e:0370:7334 world");
+		
+		assertEquals("Hello --foundit--,--foundit--,--foundit-- world", foo);
+	}
+	
+	@Test
+	public void testXForwardedForCommasWithSpacesAfterCommas() throws Exception {
+		String foo = anonymisator.process("Hello 2001:0db8:85a3:0000:0000:8a2e:0370:7334, 2001:0db8:85a3:0000:0000:8a2e:0370:7334, 2001:0db8:85a3:0000:0000:8a2e:0370:7334 world");
+		
+		assertEquals("Hello --foundit--, --foundit--, --foundit-- world", foo);
+	}
 }

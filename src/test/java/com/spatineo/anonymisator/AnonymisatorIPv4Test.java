@@ -135,4 +135,20 @@ public class AnonymisatorIPv4Test {
 		
 		assertEquals("--foundit-- hello world --foundit--", foo);
 	}
+
+
+	@Test
+	public void testXForwardedForCommas() throws Exception {
+		String foo = anonymisator.process("Hello 194.100.34.1,255.255.255.255,9.1.2.3 world");
+		
+		assertEquals("Hello --foundit--,--foundit--,--foundit-- world", foo);
+	}
+
+	@Test
+	public void testXForwardedForCommasWithSpacesAfterComma() throws Exception {
+		String foo = anonymisator.process("Hello 194.100.34.1, 255.255.255.255, 9.1.2.3 world");
+		
+		assertEquals("Hello --foundit--, --foundit--, --foundit-- world", foo);
+	}
+
 }
