@@ -155,6 +155,7 @@ public class ApplicationConfiguration {
 	public IpAddressAnonymiser ipAddressAnonymiser(DnsLookupHandler dnsLookupHandler, AnonymiserConfiguration configuration) {
 		SpatineoLogAnalysisIpAddressAnonymiser ret = new SpatineoLogAnalysisIpAddressAnonymiser();
 		ret.setIpv4BitsToAnonymize(configuration.getIpv4BitsToAnonymize());
+		ret.setIpv6BitsToAnonymize(configuration.getIpv6BitsToAnonymize());
 		ret.setDnsLookupHandler(dnsLookupHandler);
 		return ret;
 	}
