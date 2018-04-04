@@ -5,7 +5,12 @@ A working combination:
  - Oracle JDK 1.8.0_51
  - Apache Maven 3.0.4
 
-To deploy a snapshot release:
+To deploy a snapshot to Sonatype OSS:
 
   mvn clean deploy
 
+To tag + deploy a release to Sonatype OSS:
+
+  mvn clean
+  mvn release:prepare
+  mvn release:perform
