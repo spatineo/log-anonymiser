@@ -115,6 +115,23 @@ public class SpatineoLogAnalysisIpAddressAnonymiserTest {
 		// Expect to have full DNS name since local names are enabled
 		assertEquals("{!1{10.10.10.0/24,foo.hello.local}}", result);
 	}
+	
+	
+	@Test
+	public void testBasicAnonymisationAmazonawsDotCom() throws Exception {
+		
+		anonymiser.setAllowFullPrivateAddresses(false);
+		
+		DnsLookupResult mockResult = new DnsLookupResult();
+		mockResult.setReverseName("ec2-34-233-233-138.compute-1.amazonaws.com");
+		mockResult.setSuccess(true);
+		when(mockDnsLookupHandler.lookup("10.10.10.10")).thenReturn(mockResult);
+		
+		String result = anonymiser.processAddressString("10.10.10.10");
+		
+		// Expect to have full DNS name since local names are enabled
+		assertEquals("{!1{10.10.10.0/24,ec2-34-233-233-138.compute-1.amazonaws.com}}", result);
+	}
 
 
 }

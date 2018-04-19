@@ -59,12 +59,9 @@ public class IpAddressAnonymiserTest {
 
 	@Test
 	public void testBareTldNoDomain() {
-		try {
-			ipAddressAnonymiser.identifyDomainName("com");
-			fail("'com' should not be a valid domain name");
-		} catch(Exception e) {
-			assertTrue(e instanceof IllegalStateException);
-		}
+		String name = ipAddressAnonymiser.identifyDomainName("com");
+		// com is a public suffix and we need to allow that, even though this is slightly counterintuitive
+		assertEquals("com", name);
 	}
 	
 	@Test

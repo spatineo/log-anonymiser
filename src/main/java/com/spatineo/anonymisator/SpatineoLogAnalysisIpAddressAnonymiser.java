@@ -133,6 +133,15 @@ public class SpatineoLogAnalysisIpAddressAnonymiser implements IpAddressAnonymis
 			
 			return null;
 		}
+		
+		if (logger.isTraceEnabled()) {
+			logger.trace("DNS name '"+dnsName+"' hasPublicSuffix = "+idn.hasPublicSuffix()+", hasRegistrySuffix = "+idn.hasRegistrySuffix()+", hasParent = "+idn.hasParent()+", isUnderPublicSuffx = "+idn.isUnderPublicSuffix()+", isPublicSuffx = "+idn.isPublicSuffix());
+		}
+		
+		if (idn.isPublicSuffix()) {
+			return idn.toString();
+		}
+		
 		if (!idn.hasPublicSuffix()) {
 			if (isAllowFullPrivateAddresses()) {
 				return dnsName;
@@ -141,6 +150,7 @@ public class SpatineoLogAnalysisIpAddressAnonymiser implements IpAddressAnonymis
 				return null;
 			}
 		}
+		
 		return idn.topPrivateDomain().toString();
 	}
 	
