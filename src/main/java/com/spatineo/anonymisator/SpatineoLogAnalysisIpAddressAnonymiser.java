@@ -25,11 +25,14 @@ package com.spatineo.anonymisator;
  */
 
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.net.InetAddresses;
 import com.google.common.net.InternetDomainName;
 import com.spatineo.anonymisator.dns.DnsLookupHandler;
@@ -46,6 +49,8 @@ public class SpatineoLogAnalysisIpAddressAnonymiser implements IpAddressAnonymis
 	private String ipv6MaskPostfix;
 	
 	private boolean allowFullPrivateAddresses;
+	
+	private Cache<String, Object> processFailedForAddress = CacheBuilder.newBuilder().maximumSize(1000).build();
 	
 	public void setDnsLookupHandler(DnsLookupHandler dnsLookupHandler) {
 		this.dnsLookupHandler = dnsLookupHandler;
@@ -89,14 +94,27 @@ public class SpatineoLogAnalysisIpAddressAnonymiser implements IpAddressAnonymis
 		try {
 			anonymisedIp = anonymiseIp(address);
 			
-			String reverseName = reverseName(address);
+			String reverseName;
+			
+			if (processFailedForAddress.getIfPresent(address) != null) {
+				reverseName = null;
+			} else {
+				reverseName = reverseName(address);
+			}
 			
 			if (reverseName != null) {
 				domainName = identifyDomainName(reverseName);
 			}
 			
 		} catch(Exception e) {
-			logger.error("Unknown error while processing address "+address+", treating as missing DNS name. Please report full error message with stack trace along with version of software to https://github.com/spatineo/log-anonymiser/issues", e);
+			if (e instanceof SocketTimeoutException) {
+				logger.info("SocketTimeout while doing a reverse lookup of address "+address+", treating as missing DNS name."); 
+			} else {
+				logger.error("Unknown error while processing address "+address+", treating as missing DNS name. Please report full error message with stack trace along with version of software to https://github.com/spatineo/log-anonymiser/issues", e);
+			}
+			
+			processFailedForAddress.put(address, Boolean.TRUE);
+			domainName = null;
 		}
 		
 		return produceOutput(domainName, anonymisedIp);
