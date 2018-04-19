@@ -87,7 +87,7 @@ public class AnonymiserProcessor {
 	
 	public void process(Reader in, Writer out) throws Exception {
 		if (getParallelThreads() > 1) {
-			logger.info("Using multiprocessor mode");
+			logger.info("Using multithreading");
 			processParallel(in, out);
 		} else {
 			logger.info("Using single-thread mode");
