@@ -62,8 +62,10 @@ Curly braces, the exclamation mark, and a version number (1) are used to help lo
 
 ## Todo
 
+The following issues are currently open:
+
 * Read and write GZIP compressed files.
-* [HAProxy](http://www.haproxy.org/) log files contain IP addresses along with client TCP ports (for example 123.123.123.123:1432). These addresses are currently not identified.
+* [HAProxy](http://www.haproxy.org/) log files contain IP addresses along with client TCP ports (for example 123.123.123.123:1432). These addresses are currently not anonymised.
 
 ## Reporting bugs
 
