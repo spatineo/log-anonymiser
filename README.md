@@ -60,12 +60,15 @@ The final anonymised row will look like this:
 
 Curly braces, the exclamation mark, and a version number (1) are used to help log analysis software to parse this special format.
 
+## IPv4 addresses and ports
+
+Some log files contain IPv4 addresses with port numbers. For example 127.0.0.1:32183 . These are detected and rewriten so that the port postfix is attached to the anonymised IP address and the result {!1{127.0.0.0/24,localhost}}:32183.
+
 ## Todo
 
 The following issues are currently open:
 
 * Read and write GZIP compressed files.
-* [HAProxy](http://www.haproxy.org/) log files contain IP addresses along with client TCP ports (for example 123.123.123.123:1432). These addresses are currently not anonymised.
 
 ## Reporting bugs
 

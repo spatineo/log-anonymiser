@@ -113,7 +113,6 @@ public class AnonymisatorIPv4Test {
 		assertEquals("Hello --foundit-- --foundit-- world", foo);
 	}
 	
-
 	@Test
 	public void testTwoAddressOneStartOneMiddle() throws Exception {
 		String foo = anonymisator.process("194.100.34.1 hello 10.1.1.0 world");
@@ -134,6 +133,22 @@ public class AnonymisatorIPv4Test {
 		String foo = anonymisator.process("194.100.34.1 hello world 10.1.1.0");
 		
 		assertEquals("--foundit-- hello world --foundit--", foo);
+	}
+	
+
+	@Test
+	public void testPortSeparatedByColon() throws Exception {
+		String foo = anonymisator.process("Hello 194.100.34.1:1234 world");
+		
+		assertEquals("Hello --foundit--:1234 world", foo);
+	}
+
+
+	@Test
+	public void testPortSeparatedByColonCommaSeparated() throws Exception {
+		String foo = anonymisator.process("Hello 194.100.34.1:1234,127.0.0.1:32176 world");
+		
+		assertEquals("Hello --foundit--:1234,--foundit--:32176 world", foo);
 	}
 
 
