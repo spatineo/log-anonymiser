@@ -140,7 +140,8 @@ public class AnonymisatorIPv4Test {
 	public void testPortSeparatedByColon() throws Exception {
 		String foo = anonymisator.process("Hello 194.100.34.1:1234 world");
 		
-		assertEquals("Hello --foundit--:1234 world", foo);
+		// Note: ports vanished becase the IpAddressAnonymiser is supposed to handle it
+		assertEquals("Hello --foundit-- world", foo);
 	}
 
 
@@ -148,7 +149,8 @@ public class AnonymisatorIPv4Test {
 	public void testPortSeparatedByColonCommaSeparated() throws Exception {
 		String foo = anonymisator.process("Hello 194.100.34.1:1234,127.0.0.1:32176 world");
 		
-		assertEquals("Hello --foundit--:1234,--foundit--:32176 world", foo);
+		// Note: ports vanished becase the IpAddressAnonymiser is supposed to handle it
+		assertEquals("Hello --foundit--,--foundit-- world", foo);
 	}
 
 
@@ -166,4 +168,12 @@ public class AnonymisatorIPv4Test {
 		assertEquals("Hello --foundit--, --foundit--, --foundit-- world", foo);
 	}
 
+	
+	@Test
+	public void textWeirdRowWithCommasAndColons() throws Exception {
+		String foo = anonymisator.process("84.192.245.70:59913, 84.192.245.70:59913,127.0.0.1 23.97.211.140 - -");
+		
+		// Note: ports vanished becase the IpAddressAnonymiser is supposed to handle it
+		assertEquals("--foundit--, --foundit--,--foundit-- --foundit-- - -", foo);
+	}
 }

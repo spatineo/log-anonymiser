@@ -72,7 +72,6 @@ public class IpAddressAnonymiserTest {
 		assertEquals("192.168.1.0/24", result);
 	}
 	
-
 	@Test
 	public void testIpv4Masking6Bits() {
 		ipAddressAnonymiser.setIpv4BitsToAnonymize(6);

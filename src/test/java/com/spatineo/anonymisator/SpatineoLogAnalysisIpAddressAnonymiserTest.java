@@ -73,6 +73,19 @@ public class SpatineoLogAnalysisIpAddressAnonymiserTest {
 		
 		assertEquals("{!1{10.10.10.0/24}}", result);
 	}
+	
+
+	@Test
+	public void testIPv4AddressWithPort() throws Exception {
+		DnsLookupResult mockResult = new DnsLookupResult();
+		mockResult.setReverseName(null);
+		mockResult.setSuccess(false);
+		when(mockDnsLookupHandler.lookup("10.10.10.10")).thenReturn(mockResult);
+		
+		String result = anonymiser.processAddressString("10.10.10.10:4123");
+		
+		assertEquals("{!1{10.10.10.0/24}}:4123", result);
+	}
 
 	@Test
 	public void testBasicAnonymisationDNSGivesWeirdName() throws Exception {

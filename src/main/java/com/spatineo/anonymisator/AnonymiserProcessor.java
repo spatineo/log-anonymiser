@@ -53,7 +53,7 @@ public class AnonymiserProcessor {
 	 * Matcher with negative and positive lookahead testing that we only match IP addresses that are surrounded
 	 * by whitespace or a comma. The comma is necessary for X-Forwarded-For fields where addresses are separated by commas
 	 */
-	private static final Pattern IP_MATCHER = Pattern.compile("(?<=[\\s,]|^)("+IPv4_MATCHER+"(:[0-9]+)?|"+IPv6_MATCHER+")(?=[\\s,]|$)");
+	private static final Pattern IP_MATCHER = Pattern.compile("(?<=[\\s,]|^)("+IPv4_MATCHER+"(?::[0-9]+)?|"+IPv6_MATCHER+")(?=[\\s,]|$)");
 	
 	private IpAddressAnonymiser ipAddressAnonymiser;
 	private int parallelThreads;
@@ -231,12 +231,6 @@ public class AnonymiserProcessor {
 			output.append(beforeMatch);
 			
 			String result = getIpAddressAnonymiser().processAddressString(m.group(1));
-			
-			// Handle possible IPv4 port
-			String port = m.group(2);
-			if (port != null && port.length() > 0) {
-				result += port;
-			}
 			
 			output.append(result);
 		}

@@ -27,6 +27,8 @@ package com.spatineo.anonymisator;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,10 +88,18 @@ public class SpatineoLogAnalysisIpAddressAnonymiser implements IpAddressAnonymis
 		return allowFullPrivateAddresses;
 	}
 	
+	private static final Pattern IPV4_POSTFIX_EXTRACTOR = Pattern.compile("^([1-9][0-9]*\\.(?:[1-9][0-9]*|0)\\.(?:[1-9][0-9]*|0)\\.(?:[1-9][0-9]*|0))(:[0-9]+)");
 	@Override
 	public String processAddressString(String address) {
 		String domainName = null;
 		String anonymisedIp = null;
+		
+		String postfix = null;
+		Matcher postfixMatcher = IPV4_POSTFIX_EXTRACTOR.matcher(address);
+		if (postfixMatcher.matches()) {
+			address = postfixMatcher.group(1);
+			postfix = postfixMatcher.group(2);
+		}
 		
 		try {
 			anonymisedIp = anonymiseIp(address);
@@ -117,7 +127,7 @@ public class SpatineoLogAnalysisIpAddressAnonymiser implements IpAddressAnonymis
 			domainName = null;
 		}
 		
-		return produceOutput(domainName, anonymisedIp);
+		return produceOutput(domainName, anonymisedIp, postfix);
 	}
 	
 	
@@ -214,7 +224,7 @@ public class SpatineoLogAnalysisIpAddressAnonymiser implements IpAddressAnonymis
 	}
 	
 	
-	String produceOutput(String domainName, String anonymisedIp) {
+	String produceOutput(String domainName, String anonymisedIp, String postfix) {
 		StringBuffer ret = new StringBuffer("{!1{");
 		ret.append(anonymisedIp);
 		if (domainName != null) {
@@ -223,6 +233,10 @@ public class SpatineoLogAnalysisIpAddressAnonymiser implements IpAddressAnonymis
 		}
 		
 		ret.append("}}");
+		
+		if (postfix != null) {
+			ret.append(postfix);
+		}
 		
 		return ret.toString();
 	}
