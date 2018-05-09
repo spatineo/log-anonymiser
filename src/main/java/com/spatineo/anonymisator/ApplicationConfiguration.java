@@ -59,7 +59,7 @@ public class ApplicationConfiguration {
 		
 		tmp.put("dns.allowprivate", "Return full private DNS names (e.g. hello.local) when DNS returns them");
 		tmp.put("dns.disabled", "Disable DNS lookups (enabled by default)");
-		tmp.put("dns.server", "DNS server(s) to use as a comma-delimited list, for example --dns.server=8.8.8.8,4.4.4.4 for Google public DNS (use system settings by default)");
+		tmp.put("dns.server", "DNS server(s) to use as a comma-delimited list, for example --dns.server=8.8.8.8,8.8.4.4 for Google public DNS (use system settings by default)");
 		tmp.put("dns.timeoutmillis", "DNS lookup timeout in milliseconds (default 30000)");
 		tmp.put("threads", "How many concurrent threads are used in parallel (default 32)");
 		tmp.put("mask.ipv4", "How many bits in IPv4 addressess to mask / anonymise (default 8)");
