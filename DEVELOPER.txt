@@ -3,7 +3,7 @@ Developer notes for log-anonymiser
 
 A working combination:
  - Oracle JDK 1.8.0_51
- - Apache Maven 3.0.4
+ - Apache Maven 3.5.2
 
 To deploy a snapshot to Sonatype OSS:
 
