@@ -177,4 +177,58 @@ public class AnonymisatorIPv6Test {
 		
 		assertEquals("Hello --foundit--, --foundit--, --foundit-- world", foo);
 	}
+	
+	
+
+	@Test
+	public void testAddressInQuotes() throws Exception {
+		String foo = anonymisator.process("Hello \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\" world");
+
+		
+		assertEquals("Hello \"--foundit--\" world", foo);
+	}
+	
+
+	@Test
+	public void testAddressInStartOfQuotes() throws Exception {
+		String foo = anonymisator.process("Hello \"2001:0db8:85a3:0000:0000:8a2e:0370:7334, stuff\" world");
+
+		
+		assertEquals("Hello \"--foundit--, stuff\" world", foo);
+	}
+	
+	@Test
+	public void testAddressEndOfQuotes() throws Exception {
+		String foo = anonymisator.process("Hello \"foo, 2001:0db8:85a3:0000:0000:8a2e:0370:7334\" world");
+
+		
+		assertEquals("Hello \"foo, --foundit--\" world", foo);
+	}
+	
+
+	@Test
+	public void testAddressInSingleQuotes() throws Exception {
+		String foo = anonymisator.process("Hello '2001:0db8:85a3:0000:0000:8a2e:0370:7334' world");
+
+		
+		assertEquals("Hello '--foundit--' world", foo);
+	}
+	
+
+	@Test
+	public void testAddressInStartOfSingleQuotes() throws Exception {
+		String foo = anonymisator.process("Hello '2001:0db8:85a3:0000:0000:8a2e:0370:7334, stuff' world");
+
+		
+		assertEquals("Hello '--foundit--, stuff' world", foo);
+	}
+	
+	@Test
+	public void testAddressEndOfSingleQuotes() throws Exception {
+		String foo = anonymisator.process("Hello 'foo, 2001:0db8:85a3:0000:0000:8a2e:0370:7334' world");
+
+		
+		assertEquals("Hello 'foo, --foundit--' world", foo);
+	}
+	
 }

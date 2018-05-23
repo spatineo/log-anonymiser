@@ -176,4 +176,108 @@ public class AnonymisatorIPv4Test {
 		// Note: ports vanished becase the IpAddressAnonymiser is supposed to handle it
 		assertEquals("--foundit--, --foundit--,--foundit-- --foundit-- - -", foo);
 	}
+	
+	
+	@Test
+	public void testAddressInQuotes() throws Exception {
+		String foo = anonymisator.process("Hello \"127.0.0.1\" world");
+
+		
+		assertEquals("Hello \"--foundit--\" world", foo);
+	}
+	
+	@Test
+	public void testAddressWithPortInQuotes() throws Exception {
+		String foo = anonymisator.process("Hello \"127.0.0.1:1234\" world");
+
+		
+		assertEquals("Hello \"--foundit--\" world", foo);
+	}
+	
+
+	@Test
+	public void testAddressWithPortInStartOfQuotes() throws Exception {
+		String foo = anonymisator.process("Hello \"127.0.0.1:1234, stuff\" world");
+
+		
+		assertEquals("Hello \"--foundit--, stuff\" world", foo);
+	}
+	
+
+	@Test
+	public void testAddressInStartOfQuotes() throws Exception {
+		String foo = anonymisator.process("Hello \"127.0.0.1, stuff\" world");
+
+		
+		assertEquals("Hello \"--foundit--, stuff\" world", foo);
+	}
+	
+	@Test
+	public void testAddressEndOfQuotes() throws Exception {
+		String foo = anonymisator.process("Hello \"foo, 127.0.0.1\" world");
+
+		
+		assertEquals("Hello \"foo, --foundit--\" world", foo);
+	}
+	
+	@Test
+	public void testAddressWithPortEndOfQuotes() throws Exception {
+		String foo = anonymisator.process("Hello \"foo, 127.0.0.1:1234\" world");
+
+		
+		assertEquals("Hello \"foo, --foundit--\" world", foo);
+	}
+	
+	
+
+	@Test
+	public void testAddressInSingleQuotes() throws Exception {
+		String foo = anonymisator.process("Hello '127.0.0.1' world");
+
+		
+		assertEquals("Hello '--foundit--' world", foo);
+	}
+	
+	@Test
+	public void testAddressWithPortInSingleQuotes() throws Exception {
+		String foo = anonymisator.process("Hello '127.0.0.1:1234' world");
+
+		
+		assertEquals("Hello '--foundit--' world", foo);
+	}
+	
+
+	@Test
+	public void testAddressWithPortInStartOfSingleQuotes() throws Exception {
+		String foo = anonymisator.process("Hello '127.0.0.1:1234, stuff' world");
+
+		
+		assertEquals("Hello '--foundit--, stuff' world", foo);
+	}
+	
+
+	@Test
+	public void testAddressInStartOfSingleQuotes() throws Exception {
+		String foo = anonymisator.process("Hello '127.0.0.1, stuff' world");
+
+		
+		assertEquals("Hello '--foundit--, stuff' world", foo);
+	}
+	
+	@Test
+	public void testAddressEndOfSingleQuotes() throws Exception {
+		String foo = anonymisator.process("Hello 'foo, 127.0.0.1' world");
+
+		
+		assertEquals("Hello 'foo, --foundit--' world", foo);
+	}
+	
+	@Test
+	public void testAddressWithPortEndOfSingleQuotes() throws Exception {
+		String foo = anonymisator.process("Hello 'foo, 127.0.0.1:1234' world");
+
+		
+		assertEquals("Hello 'foo, --foundit--' world", foo);
+	}
+	
 }
