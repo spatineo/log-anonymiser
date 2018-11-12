@@ -282,12 +282,9 @@ public class AnonymisatorIPv4Test {
 	public void testAddressWithAllIPStartEnd0To255() throws Exception {
 
 		for(int i=0; i<256; i++){
-			for(int j=0; j<256; j++) {
-				String foo = anonymisator.process("Hello 'foo, "+i+".0.0."+j+":1234' world");
+			String foo = anonymisator.process("Hello 'foo, "+i+".0.0."+i+":1234' world");
 
-
-				assertEquals("Hello 'foo, --foundit--' world", foo);
-			}
+			assertEquals("Hello 'foo, --foundit--' world", foo);
 		}
 	}
 
