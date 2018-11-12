@@ -132,6 +132,7 @@ public class FullStackTest {
 		}
 		System.out.println(result);
 
+		//The anonymiser cannot tell whether the string 8.15.1.0 is an IP address or not and thus the expected result here is that the version number is anonymised
 		assertEquals("[08/Nov/2018:14:59:34 +0200] Version number SpatialWeb {!1{8.15.1.0/24}} ...", result);
 	}
 
