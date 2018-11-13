@@ -74,6 +74,8 @@ public class ApplicationConfiguration {
 	
 	/**
 	 * Produces a human-readable usage/help message to be presented to the user.
+	 *
+	 * @return A human readable string containing the usage message
 	 */
 	public String usage() {
 		StringBuffer buf = new StringBuffer();
