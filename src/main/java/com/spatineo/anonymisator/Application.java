@@ -25,10 +25,18 @@ package com.spatineo.anonymisator;
  */
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +57,9 @@ public class Application implements ApplicationRunner
 	
 	@Autowired
 	private ApplicationConfiguration configuration;
+	
+	@Autowired
+	private InputOutput inputOutput;
 	
 	
 	public static void main(String...args) {
@@ -111,13 +122,15 @@ public class Application implements ApplicationRunner
 				return;
 			}
 			
-			try (Reader input = new FileReader(inputFile); Writer output = new FileWriter(outputFile)) {
+			try (Reader input = inputOutput.createInput(inputFile); Writer output = inputOutput.createWriter(outputFile)) {
 				anonymisator.process(input, output);
 				output.flush();
 			}
+
 		} catch(Exception e) {
 			logger.error("Application error", e);
 		}
 	
 	}
+
 }

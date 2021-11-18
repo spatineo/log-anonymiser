@@ -64,12 +64,14 @@ public class ApplicationConfiguration {
 		tmp.put("threads", "How many concurrent threads are used in parallel (default 32)");
 		tmp.put("mask.ipv4", "How many bits in IPv4 addressess to mask / anonymise (default 8)");
 		tmp.put("mask.ipv6", "How many bits in IPv6 addressess to mask / anonymise (default 80)");
+		tmp.put("compress.input", "Is the input file gzip compressed true/false (default autodetect)");
+		tmp.put("compress.output", "Should the output file be gzip compressed true/false (default as input)");
 		tmp.put("help", "Display this message");
 		
 		legalParameters = Collections.unmodifiableMap(tmp);
 		
 		legalParametersRequireValue = Collections.unmodifiableSet(
-				new HashSet<>(Arrays.asList("dns.server", "mask.ipv4", "mask.ipv6")));
+				new HashSet<>(Arrays.asList("dns.server", "mask.ipv4", "mask.ipv6","compress.input","compress.output")));
 	}
 	
 	/**
@@ -159,6 +161,35 @@ public class ApplicationConfiguration {
 		ret.setIpv6BitsToAnonymize(configuration.getIpv6BitsToAnonymize());
 		ret.setDnsLookupHandler(dnsLookupHandler);
 		ret.setAllowFullPrivateAddresses(configuration.isAllowFullPrivateAddresses());
+		return ret;
+	}
+	
+	@Bean
+	public InputOutput inputOutput(
+			@Value("${compress.input:#{null}}") String compressInput,
+			@Value("${compress.output:#{null}}") String compressOutput) {
+		InputOutput ret = new InputOutput();
+		
+		if (compressInput != null) {
+			if ("true".equals(compressInput)) {
+				ret.setCompressInput(true);
+			} else if ("false".equals(compressInput)) {
+				ret.setCompressInput(false);
+			} else {
+				throw new IllegalArgumentException("Invalid value for compress.input '"+compressInput+"'");
+			}
+		}
+		
+		if (compressOutput != null) {
+			if ("true".equals(compressOutput)) {
+				ret.setCompressOutput(true);
+			} else if ("false".equals(compressOutput)) {
+				ret.setCompressOutput(false);
+			} else {
+				throw new IllegalArgumentException("Invalid value for compress.output '"+compressOutput+"'");
+			}
+		}
+		
 		return ret;
 	}
 	

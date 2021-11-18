@@ -18,14 +18,16 @@ When running the anonymiser, you need to specify the input and output files alon
 > java -jar log-anonymiser-0.0.3.jar
 Usage: java -jar log-anonymisator.jar [options] inputfile outputfile
 	The following options are supported:
-	  --dns.allowprivate   Return full private DNS names (e.g. hello.local) when DNS returns them
-	  --dns.disabled       Disable DNS lookups (enabled by default)
-	  --dns.server=value   DNS server(s) to use as a comma-delimited list, for example --dns.server=8.8.8.8,8.8.4.4 for Google public DNS (use system settings by default)
-	  --dns.timeoutmillis  DNS lookup timeout in milliseconds (default 30000)
-	  --help               Display this message
-	  --mask.ipv4=value    How many bits in IPv4 addressess to mask / anonymise (default 8)
-	  --mask.ipv6=value    How many bits in IPv6 addressess to mask / anonymise (default 80)
-	  --threads            How many concurrent threads are used in parallel (default 32)
+	  --compress.input=value   Is the input file gzip compressed true/false (default autodetect)
+	  --compress.output=value  Should the output file be gzip compressed true/false (default as input)
+	  --dns.allowprivate       Return full private DNS names (e.g. hello.local) when DNS returns them
+	  --dns.disabled           Disable DNS lookups (enabled by default)
+	  --dns.server=value       DNS server(s) to use as a comma-delimited list, for example --dns.server=8.8.8.8,8.8.4.4 for Google public DNS (use system settings by default)
+	  --dns.timeoutmillis      DNS lookup timeout in milliseconds (default 30000)
+	  --help                   Display this message
+	  --mask.ipv4=value        How many bits in IPv4 addressess to mask / anonymise (default 8)
+	  --mask.ipv6=value        How many bits in IPv6 addressess to mask / anonymise (default 80)
+	  --threads                How many concurrent threads are used in parallel (default 32)
 </pre>
 
 You can increase logging by setting the environment variable _JAVA_OPTIONS to "-Dlogging.level.com.spatineo=DEBUG" (or TRACE). This affects logging from this tool, but you can also change the logging level of other components by specifying a different Java package than com.spatineo.
