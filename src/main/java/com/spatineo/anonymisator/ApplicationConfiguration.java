@@ -71,7 +71,7 @@ public class ApplicationConfiguration {
 		legalParameters = Collections.unmodifiableMap(tmp);
 		
 		legalParametersRequireValue = Collections.unmodifiableSet(
-				new HashSet<>(Arrays.asList("dns.server", "mask.ipv4", "mask.ipv6","compress.input","compress.output")));
+				new HashSet<>(Arrays.asList("dns.server", "mask.ipv4", "mask.ipv6","compress.input","compress.output","threads")));
 	}
 	
 	/**
