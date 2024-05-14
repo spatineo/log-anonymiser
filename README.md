@@ -8,9 +8,17 @@ Source code is available at [GitHub](https://github.com/spatineo/log-anonymiser)
 
 Released versions are available on [Maven Central](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.spatineo%22%20a%3A%22log-anonymiser%22)
 
-The log anonymiser is developed using Java.
- - Latest version requires Java 19 or newer to run
- - Versions 1.0.x can be run with Java 8
+The log anonymiser is developed using Java and requires a Java runtime to run. OpenJDK is suggested as a runtime.
+
+## Releases
+
+### 1.1.x
+
+Functionally identical with the 1.0.x series, but has updated dependencies (Spring 6.1, Google Guava 33.2.0). Requires Java 19 or later to run
+
+### 1.0.x
+
+Original release, works with Java versions 8 and up
 
 ## Usage
 
