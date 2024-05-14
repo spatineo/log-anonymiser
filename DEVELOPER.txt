@@ -2,8 +2,8 @@ Developer notes for log-anonymiser
 ----------------------------------
 
 A working combination:
- - Oracle JDK 1.8.0_51
- - Apache Maven 3.5.2
+ - openjdk version "19.0.2" 2023-01-17
+ - Apache Maven 3.6.3
 
 To deploy a snapshot to Sonatype OSS:
 
@@ -14,3 +14,11 @@ To tag + deploy a release to Sonatype OSS:
   mvn clean
   mvn release:prepare
   mvn release:perform
+
+## Testing dependencies for vulnerabilities
+
+Run
+
+  mvn verify
+
+And check the file: target/dependency-check-report.html
