@@ -15,6 +15,14 @@ To tag + deploy a release to Sonatype OSS:
   mvn release:prepare
   mvn release:perform
 
+Also create a release on Github:
+ - https://github.com/spatineo/log-anonymiser/releases/new
+ - Select the tag (was created on sonatype release)
+ - Leave title empty
+ - Write release description
+ - Upload the .jar file as a release binary
+ - Publish release
+
 ## Testing dependencies for vulnerabilities
 
 Run
