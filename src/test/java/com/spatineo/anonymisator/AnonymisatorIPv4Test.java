@@ -277,6 +277,14 @@ public class AnonymisatorIPv4Test {
 
 		assertEquals("Hello 'foo, --foundit--' world", foo);
 	}
+	
+	@Test
+	public void testThisIsNotAnIPAddress() throws Exception {
+		String foo = anonymisator.process("Hello 'foo, 027.0.0.1:1234' world");
+
+
+		assertEquals("Hello 'foo, 027.0.0.1:1234' world", foo);
+	}
 
 	@Test
 	public void testAddressWithAllIPStartEnd0To255() throws Exception {
@@ -285,6 +293,27 @@ public class AnonymisatorIPv4Test {
 			String foo = anonymisator.process("Hello 'foo, "+i+".0.0."+i+":1234' world");
 
 			assertEquals("Hello 'foo, --foundit--' world", foo);
+		}
+	}
+
+
+	@Test
+	public void testXForwardedFor() throws Exception {
+
+		for(int i=0; i<256; i++){
+			String foo = anonymisator.process("Hello 62.159.68.218,172.22.89.43,62.159.68.218 world");
+
+			assertEquals("Hello --foundit--,--foundit--,--foundit-- world", foo);
+		}
+	}
+	
+	@Test
+	public void testCloudfrontXForwardedFor() throws Exception {
+
+		for(int i=0; i<256; i++){
+			String foo = anonymisator.process("Hello 62.159.68.218,\\x20172.22.89.43,\\x2062.159.68.218 world");
+
+			assertEquals("Hello --foundit--,\\x20--foundit--,\\x20--foundit-- world", foo);
 		}
 	}
 
