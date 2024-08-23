@@ -44,17 +44,19 @@ You can increase logging by setting the environment variable _JAVA_OPTIONS to "-
 
 ## Usage with Docker
 
-Building the container (will download the version from github): 
-```shell
-cd docker/
-docker build --build-arg VERSION=1.1.1 -t log-anonymiser:1.1.1 .
-```
+This tool is also provided as a docker container on [Dockerhub](https://hub.docker.com/repository/docker/spatineo/log-anonymiser)
 
-Running the container:
+To make it easy to run the container, this repository contains a script that uses the container on dockerhub and allows running the tool on the command line directly:
+
 ```shell
 docker/anonymise.sh inputfile outputfile [options]
 ```
 
+If you wish to build the container, you can use the command below. Note, this will download the official version from github.
+```shell
+cd docker/
+docker build --build-arg VERSION=1.1.1 -t spatineo/log-anonymiser:1.1.1 .
+```
 
 ## Anonymising logs for Spatineo Monitor
 

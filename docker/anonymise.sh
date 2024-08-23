@@ -31,4 +31,4 @@ docker run \
     --user $(stat -c "%u:%g" $INPUTFILE) \
     --mount type=bind,source=$INPUTFILE,destination=/tmp/inputfile \
     --mount type=bind,readonly=false,source=$OUTPUTDIR,destination=/tmp/outputdir \
-    log-anonymiser:1.1.1 /tmp/inputfile $OUTPUTFILE $*
+    spatineo/log-anonymiser:1.1.1 /tmp/inputfile $OUTPUTFILE $*
