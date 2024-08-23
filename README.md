@@ -25,7 +25,7 @@ Original release, works with Java versions 8 and up
 When running the anonymiser, you need to specify the input and output files along with parameters. Default parameters will work for most users.
 
 <pre>
-> java -jar log-anonymiser-0.0.3.jar
+> java -jar log-anonymiser-1.1.0.jar
 Usage: java -jar log-anonymisator.jar [options] inputfile outputfile
 	The following options are supported:
 	  --compress.input=value   Is the input file gzip compressed true/false (default autodetect)
@@ -41,6 +41,20 @@ Usage: java -jar log-anonymisator.jar [options] inputfile outputfile
 </pre>
 
 You can increase logging by setting the environment variable _JAVA_OPTIONS to "-Dlogging.level.com.spatineo=DEBUG" (or TRACE). This affects logging from this tool, but you can also change the logging level of other components by specifying a different Java package than com.spatineo.
+
+## Usage with Docker
+
+Building the container (will download the version from github): 
+```shell
+cd docker/
+docker build --build-arg VERSION=1.1.1 -t log-anonymiser:1.1.1 .
+```
+
+Running the container:
+```shell
+docker/anonymise.sh inputfile outputfile [options]
+```
+
 
 ## Anonymising logs for Spatineo Monitor
 
