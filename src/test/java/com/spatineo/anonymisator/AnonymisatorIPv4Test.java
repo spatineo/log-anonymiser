@@ -306,6 +306,26 @@ public class AnonymisatorIPv4Test {
 			assertEquals("Hello --foundit--,--foundit--,--foundit-- world", foo);
 		}
 	}
+
+	@Test
+	public void testXForwardedForWithMIISSpace() throws Exception {
+
+		for(int i=0; i<256; i++){
+			String foo = anonymisator.process("Hello 62.159.68.218,+172.22.89.43 world");
+
+			assertEquals("Hello --foundit--,+--foundit-- world", foo);
+		}
+	}
+
+	@Test
+	public void testXForwardedForWithMIISSpaceMultiple() throws Exception {
+
+		for(int i=0; i<256; i++){
+			String foo = anonymisator.process("Hello 62.159.68.218,+172.22.89.43,+62.159.68.218 world");
+
+			assertEquals("Hello --foundit--,+--foundit--,+--foundit-- world", foo);
+		}
+	}
 	
 	@Test
 	public void testCloudfrontXForwardedFor() throws Exception {
@@ -316,5 +336,4 @@ public class AnonymisatorIPv4Test {
 			assertEquals("Hello --foundit--,\\x20--foundit--,\\x20--foundit-- world", foo);
 		}
 	}
-
 }

@@ -120,7 +120,6 @@ public class FullStackTest {
 
 		when(dnsLookupHandler.lookup("8.15.1.0")).thenReturn(localhostAddress);
 
-		System.out.println(processor);
 		String str ="[08/Nov/2018:14:59:34 +0200] Version number SpatialWeb 8.15.1.0 ...";
 
 		StringWriter out = new StringWriter();
@@ -137,4 +136,38 @@ public class FullStackTest {
 		assertEquals("[08/Nov/2018:14:59:34 +0200] Version number SpatialWeb {!1{8.15.1.0/24}} ...", result);
 	}
 
+	@Test
+	public void testMIISLogWithMultipleIPs() throws Exception
+	{
+		DnsLookupResult firstAddress = new DnsLookupResult();
+		firstAddress.setSuccess(true);
+		firstAddress.setReverseName("localhost"); // Note: localhost is converted internally into null (as it's a private address)
+
+
+		DnsLookupResult secondAddress = new DnsLookupResult();
+		secondAddress.setSuccess(true);
+		secondAddress.setReverseName("foobar.com");
+		
+		DnsLookupResult thirdAddress = new DnsLookupResult();
+		thirdAddress.setSuccess(true);
+		thirdAddress.setReverseName("gah.com");
+		
+		when(dnsLookupHandler.lookup("8.15.1.0")).thenReturn(firstAddress);
+		when(dnsLookupHandler.lookup("8.15.1.1")).thenReturn(secondAddress);
+		when(dnsLookupHandler.lookup("8.15.1.2")).thenReturn(thirdAddress);
+
+		String str ="2025-02-03 06:46:14 8.15.1.0 GET /TeklaOGCWeb/WMS.ashx LAYERS=Kantakartta&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&FORMAT=image%2Fpng&cscale=50&SRS=EPSG%3A3878&BBOX=24517377.400616,6693043.2824233,24517380.787281,6693046.6690881&WIDTH=256&HEIGHT=256 443 KeyAquaRajapinta {!1{172.21.41.0/24}} Mozilla/5.0+(Windows+NT+10.0;+Win64;+x64)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/132.0.0.0+Safari/537.36 https://vihti.keyaqua.keypro.fi/ 200 0 0 1203 8.15.1.1,+8.15.1.2";
+
+		StringWriter out = new StringWriter();
+		StringReader in = new StringReader(str);
+		processor.process(in, out);
+
+		String result = out.toString();
+		if (result.endsWith("\n")) {
+			result = result.substring(0, result.length()-1);
+		}
+		System.out.println(result);
+
+		assertEquals("2025-02-03 06:46:14 {!1{8.15.1.0/24}} GET /TeklaOGCWeb/WMS.ashx LAYERS=Kantakartta&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&FORMAT=image%2Fpng&cscale=50&SRS=EPSG%3A3878&BBOX=24517377.400616,6693043.2824233,24517380.787281,6693046.6690881&WIDTH=256&HEIGHT=256 443 KeyAquaRajapinta {!1{172.21.41.0/24}} Mozilla/5.0+(Windows+NT+10.0;+Win64;+x64)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/132.0.0.0+Safari/537.36 https://vihti.keyaqua.keypro.fi/ 200 0 0 1203 {!1{8.15.1.0/24,foobar.com}},+{!1{8.15.1.0/24,gah.com}}", result);
+	}
 }
