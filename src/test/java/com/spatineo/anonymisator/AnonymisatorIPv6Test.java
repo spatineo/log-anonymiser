@@ -56,6 +56,13 @@ public class AnonymisatorIPv6Test {
 	}
 	
 	@Test
+	public void testAddressWithUrlEscapedCharacter() throws Exception {
+		String foo = anonymisator.process("Hello 2001:0db8:85a3:0000:0000:8a2e:0370:7334%20 world");
+		
+		assertEquals("Hello --foundit--%20 world", foo);
+	}
+	
+	@Test
 	public void testAddressPartOfAnotherStringShouldNotMatch1() throws Exception {
 		String foo = anonymisator.process("Hello foo2001:0db8:85a3:0000:0000:8a2e:0370:7334 world");
 		
@@ -138,6 +145,14 @@ public class AnonymisatorIPv6Test {
 		String foo = anonymisator.process("Hello 2001:0db8:85a3:0000:0000:8a2e:0370:7334 fe80::f043:57ff:fe35:77c7 world");
 		
 		assertEquals("Hello --foundit-- --founditX-- world", foo);
+	}
+
+
+	@Test
+	public void testTwoAddressSeparatedByPlus() throws Exception {
+		String foo = anonymisator.process("Hello 2001:0db8:85a3:0000:0000:8a2e:0370:7334+fe80::f043:57ff:fe35:77c7 world");
+		
+		assertEquals("Hello --foundit--+--founditX-- world", foo);
 	}
 	
 
